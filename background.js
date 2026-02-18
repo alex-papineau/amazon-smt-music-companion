@@ -3,9 +3,14 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.set({
         enabled: true,
         volume: 50,
-        track: 'content/black_market.webm', // Local file
+        track: 'assets/black_market.webm', // Local file
         activeTabs: []
     });
+});
+
+// Clear active tabs on startup to ensure state consistency
+chrome.runtime.onStartup.addListener(() => {
+    chrome.storage.local.set({ activeTabs: [] });
 });
 
 async function ensureOffscreen() {
@@ -34,14 +39,6 @@ async function closeOffscreen() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'AMAZON_VISITED') {
         handleAmazonVisit(sender.tab.id);
-    } else if (message.type === 'UPDATE_SETTINGS') {
-        // Forward settings to offscreen if it exists
-        chrome.runtime.sendMessage({ type: 'SYNC_OFFSCREEN', settings: message.settings }).catch(() => { });
-    } else if (message.type === 'GET_SETTINGS') {
-        chrome.storage.local.get(['enabled', 'volume', 'track'], (data) => {
-            sendResponse(data);
-        });
-        return true; // Keep message channel open for async response
     } else if (message.type === 'RESTART_TRACK') {
         chrome.runtime.sendMessage({ type: 'RESTART_OFFSCREEN' }).catch(() => { });
     }
