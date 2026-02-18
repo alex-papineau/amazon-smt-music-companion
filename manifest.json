@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "SMT IV: Amazon Edition",
     "description": "Plays the 'Black Market' theme from Shin Megami Tensei IV while you shop on Amazon. \n 'You HAD to come now, didn't you?'",
-    "version": "2.0",
+    "version": "2.1",
     "icons": {
         "16": "assets/smirk.png",
         "48": "assets/smirk.png",

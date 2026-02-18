@@ -5,8 +5,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     const defaults = {
         enabled: data.enabled ?? true,
         volume: data.volume ?? 50,
-        track: data.track ?? 'assets/black_market.webm',
-        activeTabs: []
+        track: data.track ?? 'assets/black_market.webm'
     };
 
     // Migrate old content/ path to assets/
@@ -17,19 +16,41 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     await chrome.storage.local.set(defaults);
 });
 
-// Clear active tabs on restart/startup
-chrome.runtime.onStartup.addListener(() => {
-    chrome.storage.local.set({ activeTabs: [] });
-});
+// Helper to sync offscreen document state with current browser state
+async function syncOffscreenState() {
+    const { enabled } = await chrome.storage.local.get(['enabled']);
 
-// Force clear active tabs on every service worker start (including reloads)
-chrome.storage.local.set({ activeTabs: [] });
+    // Check if any Amazon tabs are open
+    const amazonTabs = await chrome.tabs.query({
+        url: [
+            "https://*.amazon.com/*",
+            "https://*.amazon.ca/*",
+            "https://*.amazon.co.uk/*",
+            "https://*.amazon.de/*",
+            "https://*.amazon.fr/*",
+            "https://*.amazon.it/*",
+            "https://*.amazon.es/*",
+            "https://*.amazon.co.jp/*"
+        ]
+    });
+
+    const hasAmazonTabs = amazonTabs.length > 0;
+    console.log(`Sync check: enabled=${enabled}, active amazon tabs=${amazonTabs.length}`);
+
+    if (enabled && hasAmazonTabs) {
+        await ensureOffscreen();
+        // Give a tiny moment for document to wake up if just created
+        const settings = await chrome.storage.local.get(['enabled', 'volume', 'track']);
+        setTimeout(() => {
+            chrome.runtime.sendMessage({ type: 'SYNC_OFFSCREEN', settings }).catch(() => { });
+        }, 100);
+    } else {
+        await closeOffscreen();
+    }
+}
 
 async function ensureOffscreen() {
-    if (await chrome.offscreen.hasDocument()) {
-        console.log("Offscreen document already exists");
-        return;
-    }
+    if (await chrome.offscreen.hasDocument()) return;
 
     try {
         console.log("Creating offscreen document...");
@@ -38,7 +59,6 @@ async function ensureOffscreen() {
             reasons: ['AUDIO_PLAYBACK'],
             justification: 'Play SMT IV background music while browsing Amazon.'
         });
-        console.log("Offscreen document created");
     } catch (err) {
         if (!err.message.includes('Only a single offscreen document may be created')) {
             console.error("Failed to create offscreen document:", err);
@@ -53,13 +73,11 @@ async function closeOffscreen() {
     }
 }
 
-// Handle messages from content script, popup, and offscreen
+// Handle messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'AMAZON_VISITED') {
-        console.log(`Amazon visited on tab ${sender.tab.id}`);
-        handleAmazonVisit(sender.tab.id);
+        syncOffscreenState();
     } else if (message.type === 'RESTART_TRACK') {
-        console.log("Restart message received");
         chrome.runtime.sendMessage({ type: 'RESTART_OFFSCREEN' }).catch(() => { });
     } else if (message.type === 'GET_SETTINGS_FOR_OFFSCREEN') {
         chrome.storage.local.get(['enabled', 'volume', 'track'], (data) => {
@@ -69,57 +87,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-// Listen for storage changes to sync with offscreen document
+// Listen for storage changes
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
-        if (changes.enabled || changes.volume || changes.track) {
-            console.log("Storage changed,Fetching latest settings to notify offscreen...");
+        if (changes.enabled) {
+            syncOffscreenState();
+        } else if (changes.volume || changes.track) {
             chrome.storage.local.get(['enabled', 'volume', 'track'], (data) => {
-                chrome.runtime.sendMessage({
-                    type: 'SYNC_OFFSCREEN',
-                    settings: {
-                        enabled: data.enabled,
-                        volume: data.volume,
-                        track: data.track
-                    }
-                }).catch(() => {
-                    // Offscreen might not be open, that's fine
-                });
+                chrome.runtime.sendMessage({ type: 'SYNC_OFFSCREEN', settings: data }).catch(() => { });
             });
         }
     }
 });
 
-async function handleAmazonVisit(tabId) {
-    const { enabled, activeTabs } = await chrome.storage.local.get(['enabled', 'activeTabs']);
-
-    if (!enabled) {
-        console.log("Plugin disabled, ignoring visit");
-        return;
-    }
-
-    if (!activeTabs.includes(tabId)) {
-        const updatedTabs = [...activeTabs, tabId];
-        console.log(`Adding tab ${tabId} to active list. Total: ${updatedTabs.length}`);
-        await chrome.storage.local.set({ activeTabs: updatedTabs });
-
-        if (updatedTabs.length === 1) {
-            await ensureOffscreen();
-        }
-    }
-}
-
-// Monitor tab removals
-chrome.tabs.onRemoved.addListener(async (tabId) => {
-    const data = await chrome.storage.local.get(['activeTabs']);
-    const activeTabs = data.activeTabs || [];
-
-    if (activeTabs.includes(tabId)) {
-        const updatedTabs = activeTabs.filter(id => id !== tabId);
-        await chrome.storage.local.set({ activeTabs: updatedTabs });
-
-        if (updatedTabs.length === 0) {
-            await closeOffscreen();
-        }
+// Tab event listeners
+chrome.tabs.onRemoved.addListener(syncOffscreenState);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    // We sync on URL changes or status completion to be safe
+    if (changeInfo.url || changeInfo.status === 'complete') {
+        syncOffscreenState();
     }
 });
+
+// Initial sync on service worker wake
+syncOffscreenState();
