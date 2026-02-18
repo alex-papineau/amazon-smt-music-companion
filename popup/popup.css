@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    width: 280px;
+    background-color: #080808;
+    color: #22da09;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 15px;
+    border: 2px solid #22da09;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #22da09;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.status-blink {
+    width: 10px;
+    height: 10px;
+    background-color: #22da09;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+        box-shadow: 0 0 5px #22da09;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 5px #22da09;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.control-group {
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group-border {
+    border: 1px solid #22da09;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: not-allowed;
+}
+
+.construction-banner {
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+select {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    background: #1a1a1a;
+    color: #22da09;
+    border: 1px solid #22da09;
+    padding: 5px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: #22da09;
+    color: #080808;
+    box-shadow: 0 0 10px #22da09;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1a1a1a;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: #22da09;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #003333;
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: #1a1a1a;
+    border: 1px solid #22da09;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background: #22da09;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+select {
+    background: #1a1a1a;
+    color: #22da09;
+    border: 1px solid #22da09;
+    padding: 5px;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+select:focus {
+    outline: none;
+    box-shadow: 0 0 5px #22da09;
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: center;
+    border-top: 1px solid #22da09;
+    padding-top: 5px;
+}
+
+.footer p {
+    font-size: 10px;
+    margin: 0;
+}
