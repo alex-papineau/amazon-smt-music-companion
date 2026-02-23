@@ -12,7 +12,8 @@
         "extension_pages": "script-src 'self'; object-src 'none';"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "alarms"
     ],
     "host_permissions": [
         "https://*.amazon.com/*",

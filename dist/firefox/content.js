@@ -2,10 +2,28 @@
 chrome.runtime.sendMessage({ type: 'AMAZON_VISITED' });
 
 // Keep-alive connection for Firefox background script
-const port = chrome.runtime.connect({ name: 'keep-alive' });
-port.onDisconnect.addListener(() => {
-  console.log("Keep-alive port disconnected");
-});
+let port = null;
+
+function connectKeepAlive() {
+  port = chrome.runtime.connect({ name: 'keep-alive' });
+  port.onDisconnect.addListener(() => {
+    console.log("Keep-alive port disconnected. Attempting to reconnect...");
+    setTimeout(connectKeepAlive, 5000); // Reconnect after 5 seconds
+  });
+}
+
+connectKeepAlive();
+
+// Periodic ping to keep background alive in Firefox MV3
+setInterval(() => {
+  if (port) {
+    try {
+      port.postMessage({ type: 'ping' });
+    } catch (e) {
+      // Port might be closed, handled by onDisconnect
+    }
+  }
+}, 15000);
 
 
 // Create a stylish toast notification

@@ -173,6 +173,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onConnect.addListener((port) => {
     if (port.name === 'keep-alive') {
         // console.log("Keep-alive port connected");
+        port.onMessage.addListener((msg) => {
+            if (msg.type === 'ping') {
+                // console.log("Received keep-alive ping");
+            }
+        });
         port.onDisconnect.addListener(() => {
             // console.log("Keep-alive port disconnected");
         });
@@ -183,6 +188,15 @@ chrome.runtime.onConnect.addListener((port) => {
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
         syncState(); // active tabs check is integrated in syncState, simplifed handling
+    }
+});
+
+// Fallback heartbeat for Firefox MV3 (alarms keep the script alive)
+chrome.alarms.create('heartbeat', { periodInMinutes: 0.5 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'heartbeat') {
+        // Just waking up
+        // console.log("Background heartbeat alarm fired");
     }
 });
 

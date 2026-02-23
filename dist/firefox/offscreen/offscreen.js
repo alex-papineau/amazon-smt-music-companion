@@ -67,7 +67,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         player.currentTime = 0;
         player.play().catch(err => console.error("Restart failed:", err));
     }
-    return true;
 });
 
 init();
