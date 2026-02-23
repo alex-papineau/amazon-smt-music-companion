@@ -36,7 +36,10 @@ function updateDirectAudio(track, volume, enabled) {
     if (!audioPlayer) return;
 
     if (track !== undefined) {
-        const trackUrl = chrome.runtime.getURL(track);
+        const trackUrl = (track.startsWith('http://') || track.startsWith('https://'))
+            ? track
+            : chrome.runtime.getURL(track);
+
         if (track !== currentTrack && track) {
             console.log(`Changing track source to: ${trackUrl}`);
             currentTrack = track;
