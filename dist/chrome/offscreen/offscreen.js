@@ -8,7 +8,10 @@ console.log("Offscreen document loaded");
 // Helper to update player state
 function updatePlayer(track, volume, enabled) {
     if (track !== undefined) {
-        const trackUrl = chrome.runtime.getURL(track);
+        const trackUrl = (track.startsWith('http://') || track.startsWith('https://'))
+            ? track
+            : chrome.runtime.getURL(track);
+
         if (track !== currentTrack && track) {
             console.log(`Changing track source to: ${trackUrl}`);
             currentTrack = track;
