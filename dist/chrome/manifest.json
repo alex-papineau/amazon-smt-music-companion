@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "SMT IV: Amazon Edition",
-    "description": "Plays the 'Black Market' theme from Shin Megami Tensei IV while you shop on Amazon.\n'You HAD to come now, didn't you?'",
+    "name": "Amazon SMT Music Companion",
+    "description": "Plays music from a selection of black market/shopping related tracks from ATLUS' various games (SMT 4, SMT 3, P1 and P3 so far) while browsing Amazon. Complete with a popup UI to control the music.\n'You HAD to come now, didn't you?'",
     "version": "3.0.0",
     "icons": {
         "16": "assets/smirk.png",
