@@ -5,12 +5,14 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     const defaults = {
         enabled: data.enabled ?? true,
         volume: data.volume ?? 50,
-        track: data.track ?? 'assets/black_market.webm'
+        track: data.track ?? 'https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt4_black_market.webm'
     };
 
-    // Migrate old content/ path to assets/
-    if (defaults.track.startsWith('content/')) {
-        defaults.track = defaults.track.replace('content/', 'assets/');
+    // Migrate old local paths or incorrect names to remote
+    if (defaults.track.startsWith('assets/') || defaults.track.startsWith('content/') || defaults.track.includes('black_market.webm')) {
+        if (!defaults.track.includes('music/')) {
+            defaults.track = 'https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt4_black_market.webm';
+        }
     }
 
     await chrome.storage.local.set(defaults);

@@ -58,7 +58,6 @@
         {
             "resources": [
                 "offscreen/offscreen.html",
-                "assets/*.webm",
                 "assets/*.png"
             ],
             "matches": [
