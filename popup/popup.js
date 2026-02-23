@@ -10,10 +10,13 @@ chrome.storage.local.get(['enabled', 'volume', 'track'], (data) => {
     powerToggle.checked = data.enabled !== false; // Default to true
     volumeSlider.value = data.volume || 50;
 
-    let track = data.track || 'assets/black_market.webm';
-    if (track.startsWith('content/')) {
-        track = track.replace('content/', 'assets/');
+    let track = data.track || 'https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt4_black_market.webm';
+
+    // For legacy support/safety if someone has an old local path stored or old name
+    if (track.startsWith('assets/') || track.startsWith('content/') || (track.includes('black_market.webm') && !track.includes('music/'))) {
+        track = 'https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt4_black_market.webm';
     }
+
     trackSelect.value = track;
 });
 
