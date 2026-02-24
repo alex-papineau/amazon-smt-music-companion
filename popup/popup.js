@@ -25,8 +25,12 @@ chrome.storage.local.get(['enabled', 'volume', 'track'], (data) => {
 
     let track = data.track || getDefaultTrackUrl();
 
-    // For legacy support/safety if someone has an old local path stored or old name
-    if (track.startsWith('assets/') || track.startsWith('content/') || (track.includes('black_market.webm') && !track.includes('music/'))) {
+    // For legacy support/safety if someone has an old local path stored or old name/repo
+    const isOldPath = track.startsWith('assets/') || track.startsWith('content/');
+    const isOldRepo = track.includes('smt-music-amazon-plugin');
+    const isOldFilename = track.endsWith('/black_market.webm') && !track.includes('smt4_') && !track.includes('p1_');
+
+    if (isOldPath || isOldRepo || isOldFilename) {
         track = getDefaultTrackUrl();
     }
 

@@ -1,5 +1,5 @@
 const CONFIG = {
-    BASE_URL: 'https://alex-papineau.github.io/smt-music-amazon-plugin/music/',
+    BASE_URL: 'https://alex-papineau.github.io/amazon-smt-music-companion/music/',
     TRACKS: [
         {
             id: 'smt4_black_market',

@@ -10,8 +10,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         track: data.track ?? getDefaultTrackUrl()
     };
 
-    // Ensure track is remote
-    if (defaults.track.startsWith('assets/') || defaults.track.startsWith('content/') || (defaults.track.includes('black_market.webm') && !defaults.track.includes('music/'))) {
+    // Ensure track is remote and using the correct repo
+    const isOldPath = defaults.track.startsWith('assets/') || defaults.track.startsWith('content/');
+    const isOldRepo = defaults.track.includes('smt-music-amazon-plugin');
+    const isOldFilename = defaults.track.endsWith('/black_market.webm') && !defaults.track.includes('smt4_') && !defaults.track.includes('p1_');
+
+    if (isOldPath || isOldRepo || isOldFilename) {
         defaults.track = getDefaultTrackUrl();
     }
 
@@ -61,17 +65,21 @@ function updateDirectAudio(track, volume, enabled) {
     }
 
     console.log(`Direct Audio State: enabled=${isAudioEnabled}, volume=${currentVolume}, track=${currentTrack}`);
+}
 
+// Separated play/pause logic so it can be called synchronously
+function applyPlaybackState() {
+    if (!audioPlayer) return;
     if (isAudioEnabled) {
         if (audioPlayer.paused) {
-            console.log("Starting direct playback");
+            console.log('Starting direct playback');
             audioPlayer.play().catch(err => {
-                if (err.name !== 'AbortError') console.error("Direct playback failed:", err);
+                if (err.name !== 'AbortError') console.error('Direct playback failed:', err);
             });
         }
     } else {
         if (!audioPlayer.paused) {
-            console.log("Pausing direct playback");
+            console.log('Pausing direct playback');
             audioPlayer.pause();
         }
     }
@@ -81,12 +89,12 @@ function updateDirectAudio(track, volume, enabled) {
 async function syncState() {
     let { enabled, volume, track } = await chrome.storage.local.get(['enabled', 'volume', 'track']);
 
-    // Robust Migration: Always check if the current track is a legacy local path
-    const isLegacy = track && (track.startsWith('assets/') ||
-        track.startsWith('content/') ||
-        (track.includes('black_market.webm') && !track.includes('smt4_black_market.webm')));
+    // Robust Migration: Always check if the current track is a legacy local path or old repo
+    const isOldPath = track && (track.startsWith('assets/') || track.startsWith('content/'));
+    const isOldRepo = track && track.includes('smt-music-amazon-plugin');
+    const isOldFilename = track && track.endsWith('/black_market.webm') && !track.includes('smt4_') && !track.includes('p1_');
 
-    if (isLegacy) {
+    if (isOldPath || isOldRepo || isOldFilename) {
         console.log("Migration triggered: correcting legacy track path.");
         track = getDefaultTrackUrl();
         await chrome.storage.local.set({ track });
@@ -123,11 +131,8 @@ async function syncState() {
         }
     } else {
         // Direct Audio Logic (Firefox)
-        if (enabled && hasAmazonTabs) {
-            updateDirectAudio(track, volume, true);
-        } else {
-            updateDirectAudio(track, volume, false);
-        }
+        // Only update state here - actual play() is called synchronously from the message handler
+        updateDirectAudio(track, volume, enabled && hasAmazonTabs);
     }
 }
 
@@ -168,7 +173,15 @@ async function closeOffscreen() {
 // Handle messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'AMAZON_VISITED') {
-        syncState();
+        // Trigger sync to update tab count and verify state
+        syncState().then(() => {
+            if (HAS_DOM) {
+                // For Firefox: we play immediately when sync is done.
+                // The delay the user saw might be because syncState waits for tabs.query.
+                // Since this message came FROM an Amazon tab, we already know we have at least one.
+                applyPlaybackState();
+            }
+        });
     } else if (message.type === 'RESTART_TRACK') {
         if (HAS_DOM) {
             if (audioPlayer) {
@@ -208,7 +221,9 @@ chrome.runtime.onConnect.addListener((port) => {
 // Listen for storage changes
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
-        syncState(); // active tabs check is integrated in syncState, simplifed handling
+        syncState().then(() => {
+            if (HAS_DOM) applyPlaybackState();
+        });
     }
 });
 
