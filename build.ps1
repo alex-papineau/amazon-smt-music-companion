@@ -21,6 +21,7 @@ $commonFiles = @(
     "assets",
     "offscreen",
     "popup",
+    "config.js",
     "background.js",
     "content.css",
     "content.js",
@@ -38,13 +39,21 @@ function Copy-CommonFiles($destination) {
 
 Write-Host "Building Chrome extension..."
 Copy-CommonFiles $chromeDist
-# Copy Chrome manifest
-if (Test-Path "$rootDir\manifest.chrome.json") {
-    Copy-Item -Path "$rootDir\manifest.chrome.json" -Destination "$chromeDist\manifest.json"
-} else {
-    Write-Warning "manifest.chrome.json not found. Checking if manifest.json is Chrome version..."
-    # Fallback logic if user renamed it back manually
-    Copy-Item -Path "$rootDir\manifest.json" -Destination "$chromeDist\manifest.json"
+# Transform manifest for Chrome (MV3 Service Worker)
+if (Test-Path "$rootDir\manifest.json") {
+    $manifest = Get-Content "$rootDir\manifest.json" -Raw | ConvertFrom-Json
+    
+    # Chrome MV3 uses service_worker instead of scripts array
+    # We combine config.js and background.js logic by importing
+    $manifest.background = @{
+        service_worker = "background-chrome.js"
+    }
+    
+    $manifest | ConvertTo-Json -Depth 10 | Out-File "$chromeDist\manifest.json" -Encoding utf8
+    
+    # Create the specialized Chrome background script that imports config
+    "importScripts('config.js');`n" + (Get-Content "$rootDir\background.js" -Raw) | Out-File "$chromeDist\background-chrome.js" -Encoding utf8
+    Remove-Item "$chromeDist\background.js" -Force
 }
 
 Write-Host "Building Firefox extension..."
@@ -53,7 +62,8 @@ Copy-CommonFiles $firefoxDist
 # First check if we have an explicit firefox manifest
 if (Test-Path "$rootDir\manifest.firefox.json") {
     Copy-Item -Path "$rootDir\manifest.firefox.json" -Destination "$firefoxDist\manifest.json"
-} elseif (Test-Path "$rootDir\manifest.json") {
+}
+elseif (Test-Path "$rootDir\manifest.json") {
     # If explicit firefox manifest missing, assume current manifest.json is Firefox (per current state)
     # But ideally we rename it to manifest.firefox.json to be safe next time
     Copy-Item -Path "$rootDir\manifest.json" -Destination "$firefoxDist\manifest.json"

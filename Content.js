@@ -27,12 +27,13 @@ setInterval(() => {
 
 
 // Create a stylish toast notification
-function showSamuraiToast() {
+function showSamuraiToast(trackName) {
   const toast = document.createElement('div');
   toast.id = 'smt4-toast';
+  const bodyText = trackName || "Oh, a Hunter...";
   toast.innerHTML = `
     <div class="toast-header">Amazon SMT Music Companion</div>
-    <div class="toast-body">Oh, a Hunter...</div>
+    <div class="toast-body">Now Playing: ${bodyText}</div>
   `;
   document.body.appendChild(toast);
 
@@ -44,10 +45,15 @@ function showSamuraiToast() {
 }
 
 // Only show toast once per session if enabled
-chrome.storage.local.get(['enabled'], (data) => {
+chrome.storage.local.get(['enabled', 'track'], (data) => {
   const hasShownToast = sessionStorage.getItem('smt4_toast_shown');
   if (data.enabled && !hasShownToast) {
-    showSamuraiToast();
+    let trackName = null;
+    if (data.track) {
+      const trackObj = CONFIG.TRACKS.find(t => getTrackUrl(t.filename) === data.track);
+      if (trackObj) trackName = trackObj.name;
+    }
+    showSamuraiToast(trackName);
     sessionStorage.setItem('smt4_toast_shown', 'true');
   }
 });

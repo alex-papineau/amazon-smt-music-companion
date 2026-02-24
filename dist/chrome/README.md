@@ -38,8 +38,8 @@ The extension uses a background script to monitor your active tabs for Amazon UR
 ### Enhancements (priority: medium)
 - [x] Research alternative method for audio playback -- github page hosting
 - [ ] Volume fade-in/out transitions.
-- [ ] Add a "Random" button to the track select.
-- [ ] UI Styling updates.
+- [x] Add a "Random" button to the track select.
+- [x] UI Styling updates.
 
 ### Browser Support (priority: low)
 - [ ] Verify content script permissions across different browser engines.

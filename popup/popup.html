@@ -20,11 +20,20 @@
         </div>
 
         <div class="control-group">
+            <label>ACTIVE TAB ONLY</label>
+            <label class="switch">
+                <input type="checkbox" id="active-tab-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="control-group">
             <label>CONTROLS</label>
             <div class="button-group">
                 <button id="play-btn">PLAY</button>
                 <button id="pause-btn">PAUSE</button>
                 <button id="restart-btn">RESTART</button>
+                <button id="random-btn">RANDOM</button>
             </div>
         </div>
 
@@ -36,15 +45,7 @@
         <div class="control-group control-group-border">
             <label>TRACK SELECT</label>
             <select id="track-select">
-                <option value="https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt4_black_market.webm">SMT
-                    IV: Black Market</option>
-                <option value="https://alex-papineau.github.io/smt-music-amazon-plugin/music/p1_black_market.webm">
-                    Persona 1: Black Market</option>
-                <option value="https://alex-papineau.github.io/smt-music-amazon-plugin/music/smt3_junk_shop.mp3">SMT
-                    III: Junk Shop</option>
-                <option
-                    value="https://alex-papineau.github.io/smt-music-amazon-plugin/music/p3_tanakas_amazing_commodities.mp3">
-                    P3: Tanaka's Amazing Commodities</option>
+                <!-- Dynamically populated by popup.js -->
             </select>
         </div>
     </div>
@@ -53,6 +54,7 @@
         <p class="construction-banner">Make sure you bring more Macca next time.</p>
     </div>
 
+    <script src="../config.js"></script>
     <script src="popup.js"></script>
 </body>
 

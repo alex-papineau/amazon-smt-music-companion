@@ -161,8 +161,10 @@ input[type=range] {
     -webkit-appearance: none;
     appearance: none;
     background: transparent;
+    width: 100%;
 }
 
+/* Track Styling */
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
     height: 4px;
@@ -170,6 +172,14 @@ input[type=range]::-webkit-slider-runnable-track {
     border: 1px solid #22da09;
 }
 
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    background: #1a1a1a;
+    border: 1px solid #22da09;
+}
+
+/* Thumb Styling */
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 14px;
@@ -177,6 +187,17 @@ input[type=range]::-webkit-slider-thumb {
     background: #22da09;
     cursor: pointer;
     margin-top: -6px;
+    /* Centering for Webkit */
+}
+
+input[type=range]::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    background: #22da09;
+    cursor: pointer;
+    border: none;
+    border-radius: 0;
+    /* Match the tech theme */
 }
 
 select {
