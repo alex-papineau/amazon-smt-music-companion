@@ -4,7 +4,8 @@ body {
     width: 280px;
     background-color: #080808;
     color: #22da09;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Share Tech Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+
     margin: 0;
     padding: 15px;
     border: 2px solid #22da09;
@@ -97,11 +98,23 @@ button {
     background: #1a1a1a;
     color: #22da09;
     border: 1px solid #22da09;
-    padding: 5px 10px;
+    padding: 5px 12px;
     font-family: 'Share Tech Mono', monospace;
     cursor: pointer;
     font-size: 11px;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#toggle-btn {
+    min-width: 44px;
+    height: 30px;
+}
+
+#toggle-btn svg {
+    display: block;
 }
 
 button:hover {

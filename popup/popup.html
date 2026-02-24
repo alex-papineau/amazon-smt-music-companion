@@ -11,27 +11,11 @@
     </div>
 
     <div class="controls">
+
         <div class="control-group">
             <label>SYSTEM POWER</label>
-            <label class="switch">
-                <input type="checkbox" id="power-toggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="control-group">
-            <label>ACTIVE TAB ONLY</label>
-            <label class="switch">
-                <input type="checkbox" id="active-tab-toggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="control-group">
-            <label>CONTROLS</label>
             <div class="button-group">
-                <button id="play-btn">PLAY</button>
-                <button id="pause-btn">PAUSE</button>
+                <button id="toggle-btn"></button>
                 <button id="restart-btn">RESTART</button>
                 <button id="random-btn">RANDOM</button>
             </div>
@@ -42,12 +26,21 @@
             <input type="range" id="volume-slider" min="0" max="100" value="50">
         </div>
 
-        <div class="control-group control-group-border">
+        <div class="control-group">
             <label>TRACK SELECT</label>
             <select id="track-select">
                 <!-- Dynamically populated by popup.js -->
             </select>
         </div>
+
+        <div class="control-group">
+            <label>ACTIVE TAB ONLY</label>
+            <label class="switch">
+                <input type="checkbox" id="active-tab-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
     </div>
 
     <div class="footer">

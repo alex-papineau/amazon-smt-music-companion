@@ -1,11 +1,14 @@
-const powerToggle = document.getElementById('power-toggle');
 const activeTabToggle = document.getElementById('active-tab-toggle');
 const volumeSlider = document.getElementById('volume-slider');
 const trackSelect = document.getElementById('track-select');
-const playBtn = document.getElementById('play-btn');
-const pauseBtn = document.getElementById('pause-btn');
+const toggleBtn = document.getElementById('toggle-btn');
 const restartBtn = document.getElementById('restart-btn');
 const randomBtn = document.getElementById('random-btn');
+
+const PLAY_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+const PAUSE_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+
+let isMusicEnabled = true;
 
 // Populate track list from CONFIG
 function populateTracks() {
@@ -22,7 +25,9 @@ function populateTracks() {
 chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab'], (data) => {
     populateTracks();
 
-    powerToggle.checked = data.enabled !== false; // Default to true
+    isMusicEnabled = data.enabled !== false; // Default to true
+    updateToggleIcon(isMusicEnabled);
+
     activeTabToggle.checked = data.onlyActiveTab !== false; // Default to true
     volumeSlider.value = data.volume || 50;
 
@@ -43,16 +48,20 @@ chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab'], (data)
 // Save settings
 function updateSettings() {
     const settings = {
-        enabled: powerToggle.checked,
+        enabled: isMusicEnabled,
         onlyActiveTab: activeTabToggle.checked,
         volume: parseInt(volumeSlider.value),
         track: trackSelect.value
     };
 
     chrome.storage.local.set(settings);
+    updateToggleIcon(settings.enabled);
 }
 
-powerToggle.addEventListener('change', updateSettings);
+function updateToggleIcon(enabled) {
+    toggleBtn.innerHTML = enabled ? PAUSE_ICON : PLAY_ICON;
+}
+
 activeTabToggle.addEventListener('change', updateSettings);
 volumeSlider.addEventListener('input', updateSettings);
 trackSelect.addEventListener('change', updateSettings);
@@ -62,15 +71,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.track) {
         trackSelect.value = changes.track.newValue;
     }
+    if (area === 'local' && changes.enabled) {
+        isMusicEnabled = changes.enabled.newValue;
+        updateToggleIcon(isMusicEnabled);
+    }
 });
 
-playBtn.addEventListener('click', () => {
-    powerToggle.checked = true;
-    updateSettings();
-});
-
-pauseBtn.addEventListener('click', () => {
-    powerToggle.checked = false;
+toggleBtn.addEventListener('click', () => {
+    isMusicEnabled = !isMusicEnabled;
     updateSettings();
 });
 
