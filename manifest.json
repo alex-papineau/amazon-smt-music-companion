@@ -50,10 +50,10 @@
             ],
             "js": [
                 "config.js",
-                "content.js"
+                "Content.js"
             ],
             "css": [
-                "content.css"
+                "Content.css"
             ]
         }
     ],
