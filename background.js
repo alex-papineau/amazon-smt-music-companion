@@ -1,12 +1,13 @@
 // Initialize storage with defaults
 chrome.runtime.onInstalled.addListener(async (details) => {
-    const data = await chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab']);
+    const data = await chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab', 'repeat']);
 
     const defaults = {
         enabled: data.enabled ?? true,
         volume: data.volume ?? 50,
         track: data.track ?? getRandomTrackUrl(),
-        onlyActiveTab: data.onlyActiveTab ?? true
+        onlyActiveTab: data.onlyActiveTab ?? true,
+        repeat: data.repeat ?? false
     };
 
     await chrome.storage.local.set(defaults);
@@ -14,7 +15,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 // Audio Player
 let audioPlayer = new Audio();
-audioPlayer.loop = true;
+audioPlayer.loop = false; // Default to shuffle (looping handled by ended event or loop property)
 audioPlayer.crossOrigin = 'anonymous';
 
 let currentTrack = '';
@@ -22,8 +23,11 @@ let currentVolume = 50;
 let isAudioEnabled = true;
 
 // Function to handle audio playback state
-function updateAudioState(track, volume, enabled) {
+async function updateAudioState(track, volume, enabled) {
     if (!audioPlayer) return;
+
+    const { repeat } = await chrome.storage.local.get('repeat');
+    audioPlayer.loop = !!repeat;
 
     if (track !== undefined) {
         const trackUrl = (track.startsWith('http://') || track.startsWith('https://'))
@@ -47,8 +51,18 @@ function updateAudioState(track, volume, enabled) {
         isAudioEnabled = enabled;
     }
 
-    console.log(`Audio state updated: enabled=${isAudioEnabled}, volume=${currentVolume}, track=${currentTrack}`);
+    console.log(`Audio state updated: enabled=${isAudioEnabled}, volume=${currentVolume}, track=${currentTrack}, repeat=${repeat}`);
 }
+
+// Handle track end for shuffle mode
+audioPlayer.onended = () => {
+    chrome.storage.local.get('repeat', (data) => {
+        if (!data.repeat) {
+            console.log('Track ended, shuffling to next random track...');
+            randomizeTrack();
+        }
+    });
+};
 
 // Play/Pause execution
 function applyPlaybackState() {
@@ -120,15 +134,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.type === 'RESTART_TRACK') {
         if (audioPlayer) {
             audioPlayer.currentTime = 0;
-            audioPlayer.play().catch(console.error);
+            // Force re-sync to start playback if allowed
+            syncState().then(() => applyPlaybackState());
         }
+    } else if (message.type === 'GET_PROGRESS') {
+        if (audioPlayer && !isNaN(audioPlayer.duration)) {
+            sendResponse({
+                currentTime: audioPlayer.currentTime,
+                duration: audioPlayer.duration,
+                paused: audioPlayer.paused
+            });
+        } else {
+            sendResponse({ currentTime: 0, duration: 0, paused: true });
+        }
+        return true; // Keep message channel open for response
+    } else if (message.type === 'SEEK_TRACK') {
+        if (audioPlayer && audioPlayer.duration) {
+            audioPlayer.currentTime = (message.progress / 100) * audioPlayer.duration;
+            sendResponse({ success: true });
+        }
+        return false;
     }
     return false;
 });
 
-// New random selection
+// New random selection (avoids immediate repeat)
 async function randomizeTrack() {
-    const newTrack = getRandomTrackUrl();
+    const newTrack = getRandomTrackUrl(currentTrack);
     await chrome.storage.local.set({ track: newTrack });
     syncState().then(() => {
         applyPlaybackState();
