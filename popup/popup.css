@@ -1,14 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@font-face {
+    font-family: 'Megaten20XX';
+    src: url('../font/Megaten20XX.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 
 body {
-    width: 280px;
+    width: 320px;
     background-color: #080808;
-    color: #22da09;
-    font-family: 'Share Tech Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+    color: #fff;
+    font-family: 'Megaten20XX', 'Consolas', 'Monaco', 'Courier New', monospace;
 
     margin: 0;
     padding: 15px;
-    border: 2px solid #22da09;
+    border: 2px solid #fff;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
     overflow: hidden;
 }
@@ -17,39 +22,24 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #22da09;
+    border-bottom: 1px solid #fff;
     padding-bottom: 5px;
     margin-bottom: 15px;
 }
 
 h1 {
-    font-size: 18px;
+    font-size: 11px;
     margin: 0;
     letter-spacing: 2px;
 }
 
 .status-blink {
-    width: 10px;
-    height: 10px;
-    background-color: #22da09;
-    border-radius: 50%;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0% {
-        opacity: 1;
-        box-shadow: 0 0 5px #22da09;
-    }
-
-    50% {
-        opacity: 0.3;
-    }
-
-    100% {
-        opacity: 1;
-        box-shadow: 0 0 5px #22da09;
-    }
+    width: 30px;
+    height: 30px;
+    background-image: url('../img/status-blink.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .controls {
@@ -66,7 +56,7 @@ h1 {
 }
 
 .control-group-border {
-    border: 1px solid #22da09;
+    border: 1px solid #fff;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -74,7 +64,7 @@ h1 {
 }
 
 .construction-banner {
-    font-size: 14px;
+    font-size: 11px;
     text-transform: uppercase;
     font-weight: 700;
 }
@@ -84,7 +74,7 @@ select {
 }
 
 label {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -96,10 +86,10 @@ label {
 
 button {
     background: #1a1a1a;
-    color: #22da09;
-    border: 1px solid #22da09;
+    color: #fff;
+    border: 1px solid #fff;
     padding: 5px 12px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Megaten20XX', monospace;
     cursor: pointer;
     font-size: 11px;
     transition: all 0.2s;
@@ -118,13 +108,35 @@ button {
 }
 
 button:hover {
-    background: #22da09;
+    background: #fff;
     color: #080808;
-    box-shadow: 0 0 10px #22da09;
+    box-shadow: 0 0 10px #fff;
 }
 
 button:active {
     transform: scale(0.95);
+}
+
+button.active {
+    background: #fff;
+    color: #080808;
+    box-shadow: 0 0 10px #fff;
+}
+
+.status-message {
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px dashed #fff;
+    text-align: center;
+    color: #fff;
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0% { border-color: rgba(255, 255, 255, 0.3); }
+    50% { border-color: rgba(255, 255, 255, 1); }
+    100% { border-color: rgba(255, 255, 255, 0.3); }
 }
 
 .switch {
@@ -158,7 +170,7 @@ button:active {
     width: 16px;
     left: 4px;
     bottom: 3px;
-    background-color: #22da09;
+    background-color: #fff;
     transition: .4s;
 }
 
@@ -177,36 +189,33 @@ input[type=range] {
     width: 100%;
 }
 
-/* Track Styling */
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
     height: 4px;
     background: #1a1a1a;
-    border: 1px solid #22da09;
+    border: 1px solid #fff;
 }
 
 input[type=range]::-moz-range-track {
     width: 100%;
     height: 4px;
     background: #1a1a1a;
-    border: 1px solid #22da09;
+    border: 1px solid #fff;
 }
 
-/* Thumb Styling */
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 14px;
     width: 14px;
-    background: #22da09;
+    background: #fff;
     cursor: pointer;
     margin-top: -6px;
-    /* Centering for Webkit */
 }
 
 input[type=range]::-moz-range-thumb {
     height: 14px;
     width: 14px;
-    background: #22da09;
+    background: #fff;
     cursor: pointer;
     border: none;
     border-radius: 0;
@@ -215,25 +224,32 @@ input[type=range]::-moz-range-thumb {
 
 select {
     background: #1a1a1a;
-    color: #22da09;
-    border: 1px solid #22da09;
+    color: #fff;
+    border: 1px solid #fff;
     padding: 5px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Megaten20XX', monospace;
 }
 
 select:focus {
     outline: none;
-    box-shadow: 0 0 5px #22da09;
+    box-shadow: 0 0 5px #fff;
 }
 
 .footer {
     margin-top: 20px;
     text-align: center;
-    border-top: 1px solid #22da09;
+    border-top: 1px solid #fff;
     padding-top: 5px;
 }
 
 .footer p {
-    font-size: 10px;
+    font-size: 11px;
     margin: 0;
+}
+
+.track-time {
+    font-size: 11px;
+    color: #fff;
+    text-align: right;
+    margin-top: 4px;
 }
