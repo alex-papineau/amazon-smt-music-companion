@@ -1,28 +1,24 @@
 # Amazon SMT Music Companion
 
-A Firefox Extension that plays music from a selection of black market/shopping related tracks from ATLUS' various games (SMT 4, SMT 3, P1 and P3 so far) while browsing Amazon. Complete with a popup UI to control the music.
+A Firefox extension that plays shop and "black market" music from *Shin Megami Tensei* and *Persona* games while you browse Amazon.
 
-*"Make sure you bring more Macca next time."*
+## Core Features
+
+- **Contextual Playback**: Music starts automatically on Amazon and pauses when switching to non-Amazon tabs.
+- **Themed UI**: Popup interface and in-page "Now Playing" notifications.
+- **Playback Controls**: Toggle power, adjust volume, select specific tracks, or randomize via the toolbar popup.
 
 ## Installation
 
 1. Clone or download this repository.
-2. Open Firefox and navigate to `about:debugging`.
-3. Click **This Firefox** in the top left.
-4. Click **Load Temporary Add-on** and select the `manifest.json` file in the root directory of this project.
-5. **Visit Amazon.** The song should play automatically. Click the extension icon in the toolbar to open the controls.
+2. Go to `about:debugging` in Firefox.
+3. Click **This Firefox** > **Load Temporary Add-on**.
+4. Select `manifest.json`.
+5. Visit any Amazon domain to activate.
 
-## How it works
+## TO DO
 
-The extension uses a background script to monitor your active tabs for Amazon URLs. When an Amazon page is detected, it triggers audio playback of tracks hosted via GitHub Pages. The background page in Firefox handles the playback directly using the standard Audio API.
-
-## Features
-
-- **"Active Tab Only" Playback**: Automatically pauses music when you switch to other tabs or windows.
-- **Track Randomization**: Pick a random track anytime with the "RANDOM" button.
-- **SMT IV Style UI**: A terminal-themed popup interface inspired by SMT IV.
-- **Dynamic Notifications**: A custom "Now Playing" toast appears on Amazon pages.
-
-## License
-
-MIT
+- Add more music
+- Make the Random button not truly random to prevent repeats
+- Make the music shuffle by default and add a "Repeat" button to toggle repeat mode
+- Update UI to add a message when no amazon tab is open
