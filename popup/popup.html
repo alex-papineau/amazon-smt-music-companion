@@ -2,55 +2,79 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <title>Amazon SMT Music Companion</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 
-<body class="smt4-theme">
-    <div class="header">
-        <div class="status-blink"></div>
-    </div>
-
-    <div class="controls">
-
-        <div class="control-group">
-            <label>SYSTEM POWER</label>
-            <div class="button-group">
-                <button id="toggle-btn"></button>
-                <button id="restart-btn">RESTART</button>
+<body class="smt-hud themed">
+    <div class="hud-container">
+        <!-- HEADER / STATUS SECTION -->
+        <header class="hud-header">
+            <div class="status-indicator">
+                <img src="../assets/press-turn.gif" id="status-icon" alt="Status">
             </div>
-            <br />
-            <div class="button-group">
-                <button id="random-btn">RANDOM</button>
-                <button id="repeat-btn">REPEAT</button>
+            <div class="title-section">
+                <h1 class="glitch-text" data-text="AMAZON SMT MUSIC COMPANION">AMAZON SMT MUSIC COMPANION</h1>
+                <div id="market-status" class="connection-status">INITIALIZING...</div>
             </div>
-        </div>
+        </header>
 
-        <div class="control-group">
-            <label>AUDIO GAIN</label>
-            <input type="range" id="volume-slider" min="0" max="100" value="50">
-        </div>
+        <!-- MAIN PLAYER CORE -->
+        <main class="player-core">
+            <div class="track-info">
+                <label class="hud-label">SONG SELECT</label>
+                <div class="select-wrapper">
+                    <select id="track-select">
+                        <!-- Dynamically populated -->
+                    </select>
+                </div>
+            </div>
 
-        <div class="control-group">
-            <label>TRACK PROGRESS</label>
-            <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
-            <div id="time-display" class="track-time">0:00 / 0:00</div>
-        </div>
+            <div class="progress-section">
+                <div class="bar-container">
+                    <div class="bar-decoration left"></div>
+                    <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
+                    <div class="bar-decoration right"></div>
+                </div>
+                <div id="time-display" class="track-time">0:00 / 0:00</div>
+            </div>
+        </main>
 
-        <div class="control-group">
-            <label>TRACK SELECT</label>
-            <select id="track-select">
-                <!-- Dynamically populated by popup.js -->
-            </select>
-        </div>
+        <!-- CONTROL DASHBOARD -->
+        <section class="control-dashboard">
+            <div class="primary-controls">
+                <button id="toggle-btn" class="glow-btn" title="Toggle Power">
+                    <!-- Icon inserted by JS -->
+                </button>
+                <div class="aux-controls">
+                    <button id="restart-btn" class="icon-btn" title="Restart Track">RESTART</button>
+                    <button id="random-btn" class="icon-btn" title="Random Track">RANDOM</button>
+                    <button id="repeat-btn" class="icon-btn" title="Loop Mode">REPEAT</button>
+                </div>
+            </div>
 
-        <div class="control-group">
-            <label>ACTIVE TAB ONLY</label>
-            <label class="switch">
-                <input type="checkbox" id="active-tab-toggle">
-                <span class="slider"></span>
-            </label>
-        </div>
+            <div class="mixer-settings">
+                <div class="mixer-row">
+                    <label class="hud-label">VOLUME</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="volume-slider" min="0" max="100" value="50">
+                    </div>
+                </div>
+                
+                <div class="mixer-row">
+                    <label class="hud-label">PLAY SONG OUTSIDE OF AMAZON?</label>
+                    <label class="hud-switch">
+                        <input type="checkbox" id="active-tab-toggle">
+                        <span class="hud-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
 
+        <footer class="hud-footer">
+            <p class="version">V5.0.0</p>
+        </footer>
     </div>
 
     <script src="../config.js"></script>

@@ -9,8 +9,8 @@ const marketStatus = document.getElementById('market-status');
 const progressBar = document.getElementById('progress-bar');
 const timeDisplay = document.getElementById('time-display');
 
-const PLAY_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-const PAUSE_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+const PLAY_ICON = `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+const PAUSE_ICON = `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
 let isMusicEnabled = true;
 
@@ -58,8 +58,10 @@ function updateSettings() {
 function updateRepeatState(isRepeating) {
     if (isRepeating) {
         repeatBtn.classList.add('active');
+        repeatBtn.style.boxShadow = "0 0 8px #fff";
     } else {
         repeatBtn.classList.remove('active');
+        repeatBtn.style.boxShadow = "none";
     }
 }
 
@@ -71,11 +73,13 @@ async function checkAmazonTab() {
         url.includes('amazon.es') || url.includes('amazon.co.jp');
 
     if (isAmazon) {
-        marketStatus.textContent = "CONNECTED: Market is open.";
+        marketStatus.textContent = "LINK ONLINE";
         marketStatus.style.color = "#fff";
+        marketStatus.style.opacity = "1";
     } else {
-        marketStatus.textContent = "WAITING: No market detected in sector.";
-        marketStatus.style.color = "#ff3e3e";
+        marketStatus.textContent = "LINK OFFLINE // NO TARGET DETECTED";
+        marketStatus.style.color = "var(--accent-red)";
+        marketStatus.style.opacity = "0.8";
     }
 }
 
@@ -109,6 +113,11 @@ progressBar.addEventListener('input', () => {
 
 function updateToggleIcon(enabled) {
     toggleBtn.innerHTML = enabled ? PAUSE_ICON : PLAY_ICON;
+    const statusIcon = document.getElementById('status-icon');
+    if (statusIcon) {
+        statusIcon.style.opacity = enabled ? "1" : "0.5";
+        statusIcon.style.filter = enabled ? "drop-shadow(0 0 5px #fff)" : "grayscale(1)";
+    }
 }
 
 activeTabToggle.addEventListener('change', updateSettings);
@@ -138,17 +147,23 @@ toggleBtn.addEventListener('click', () => {
 });
 
 restartBtn.addEventListener('click', () => {
-    // Turning on power when clicking Restart for less buggy UX
     isMusicEnabled = true;
     updateSettings();
     chrome.runtime.sendMessage({ type: 'RESTART_TRACK' });
+    
+    // Quick flash effect
+    restartBtn.style.backgroundColor = "#fff";
+    setTimeout(() => restartBtn.style.backgroundColor = "", 150);
 });
 
 randomBtn.addEventListener('click', () => {
-    // Turning on power when clicking Random for less buggy UX
     isMusicEnabled = true;
     updateSettings();
     chrome.runtime.sendMessage({ type: 'RANDOMIZE_TRACK' });
+
+    // Quick flash effect
+    randomBtn.style.backgroundColor = "#fff";
+    setTimeout(() => randomBtn.style.backgroundColor = "", 150);
 });
 
 repeatBtn.addEventListener('click', () => {
