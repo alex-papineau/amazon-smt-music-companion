@@ -6,8 +6,8 @@
 }
 
 :root {
-    --dark-bg: #0b0e14;
-    --glass-bg: rgba(11, 14, 20, 0.85);
+    --dark-bg: #000;
+    --glass-bg: #000;
     --border-color: rgba(255, 255, 255, 1);
     --glow-color: rgba(255, 255, 255, 1);
     --text-color: #ffffff;
@@ -92,13 +92,12 @@ header {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
 }
 
 .hud-label {
     font-size: 10px;
     color: #fff;
-    margin-bottom: 4px;
+    margin-bottom: 10px;
     display: block;
     letter-spacing: 1px;
 }
