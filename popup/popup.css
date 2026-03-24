@@ -52,7 +52,6 @@ header {
 .status-indicator {
     width: 44px;
     height: 44px;
-    background: var(--dark-bg);
     border: 1px solid #fff;
     display: flex;
     align-items: center;
@@ -69,7 +68,7 @@ header {
 }
 
 .glitch-text {
-    font-size: 16px;
+    font-size: 14px;
     margin: 0;
     letter-spacing: 2px;
     color: #fff;
@@ -235,24 +234,18 @@ input[type=range]#progress-bar::-webkit-slider-thumb {
 }
 
 .mixer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 8px;
     border: 1px solid var(--border-color);
     background: rgba(0, 0, 0, 0.2);
-}
-
-.slider-wrapper {
-    width: 60%;
 }
 
 input[type=range]#volume-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     outline: none;
 }
 
