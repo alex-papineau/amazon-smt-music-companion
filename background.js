@@ -1,12 +1,11 @@
 // Initialize storage with defaults
 chrome.runtime.onInstalled.addListener(async (details) => {
-    const data = await chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab', 'repeat']);
+    const data = await chrome.storage.local.get(['enabled', 'volume', 'track', 'repeat']);
 
     const defaults = {
         enabled: data.enabled ?? true,
         volume: data.volume ?? 50,
         track: data.track ?? getRandomTrackUrl(),
-        onlyActiveTab: data.onlyActiveTab ?? true,
         repeat: data.repeat ?? false
     };
 
@@ -21,6 +20,7 @@ audioPlayer.crossOrigin = 'anonymous';
 let currentTrack = '';
 let currentVolume = 50;
 let isAudioEnabled = true;
+let isBrowserFocused = true; // Track if the browser window has focus
 
 // Function to handle audio playback state
 async function updateAudioState(track, volume, enabled) {
@@ -84,41 +84,22 @@ function applyPlaybackState() {
 
 // Sync player with storage and browser tabs
 async function syncState() {
-    let { enabled, volume, track, onlyActiveTab } = await chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab']);
-
-    if (onlyActiveTab === undefined) onlyActiveTab = true;
-
-    // Check for Amazon tabs
-    const amazonTabs = await chrome.tabs.query({
-        url: [
-            "https://*.amazon.com/*",
-            "https://*.amazon.ca/*",
-            "https://*.amazon.co.uk/*",
-            "https://*.amazon.de/*",
-            "https://*.amazon.fr/*",
-            "https://*.amazon.it/*",
-            "https://*.amazon.es/*",
-            "https://*.amazon.co.jp/*"
-        ]
-    });
-
-    const hasAmazonTabs = amazonTabs.length > 0;
+    let { enabled, volume, track } = await chrome.storage.local.get(['enabled', 'volume', 'track']);
 
     // Check if the focused tab is Amazon
     let isActiveTabAmazon = false;
-    if (onlyActiveTab) {
-        const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-        if (activeTab && activeTab.url) {
-            const url = activeTab.url;
-            isActiveTabAmazon = url.includes('amazon.com') || url.includes('amazon.ca') || url.includes('amazon.co.uk') ||
-                url.includes('amazon.de') || url.includes('amazon.fr') || url.includes('amazon.it') ||
-                url.includes('amazon.es') || url.includes('amazon.co.jp');
-        }
+    const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    if (activeTab && activeTab.url) {
+        const url = activeTab.url;
+        isActiveTabAmazon = url.includes('amazon.com') || url.includes('amazon.ca') || url.includes('amazon.co.uk') ||
+            url.includes('amazon.de') || url.includes('amazon.fr') || url.includes('amazon.it') ||
+            url.includes('amazon.es') || url.includes('amazon.co.jp');
     }
 
-    const shouldPlay = enabled && hasAmazonTabs && (!onlyActiveTab || isActiveTabAmazon);
+    // New logic: Music ONLY plays if enabled, browser is focused, AND on Amazon.
+    const shouldPlay = enabled && isBrowserFocused && isActiveTabAmazon;
 
-    console.log(`Sync complete: shouldPlay=${shouldPlay}, onlyActiveTab=${onlyActiveTab}, activeVisible=${isActiveTabAmazon}`);
+    console.log(`Sync complete: shouldPlay=${shouldPlay}, isActiveTabAmazon=${isActiveTabAmazon}, browserFocused=${isBrowserFocused}`);
 
     updateAudioState(track, volume, shouldPlay);
 }
@@ -212,11 +193,16 @@ chrome.tabs.onActivated.addListener(() => {
     });
 });
 
-chrome.windows.onFocusChanged.addListener(() => {
+chrome.windows.onFocusChanged.addListener((windowId) => {
+    isBrowserFocused = (windowId !== chrome.windows.WINDOW_ID_NONE);
     syncState().then(() => {
         applyPlaybackState();
     });
 });
 
 // Start sync
-syncState();
+chrome.windows.getLastFocused({ populate: false }, (window) => {
+    // If no window is found or it's not focused, start as false
+    isBrowserFocused = !!(window && window.focused);
+    syncState();
+});

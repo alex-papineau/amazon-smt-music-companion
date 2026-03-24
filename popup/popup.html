@@ -10,14 +10,16 @@
 <body class="smt-hud themed">
     <div class="hud-container">
         <!-- HEADER / STATUS SECTION -->
-        <header class="hud-header">
-            <div class="status-indicator">
-                <img src="../assets/press-turn.gif" id="status-icon" alt="Status">
+        <header>
+            <div class="hud-header">
+                <div class="status-indicator">
+                    <img src="../assets/press-turn.gif" id="status-icon" alt="Status">
+                </div>
+                <div class="title-section">
+                    <h1 class="glitch-text" data-text="AMAZON SMT MUSIC COMPANION">AMAZON SMT MUSIC COMPANION</h1>
+                </div>
             </div>
-            <div class="title-section">
-                <h1 class="glitch-text" data-text="AMAZON SMT MUSIC COMPANION">AMAZON SMT MUSIC COMPANION</h1>
-                <div id="market-status" class="connection-status">INITIALIZING...</div>
-            </div>
+            <div style="padding-top: 5px;" id="market-status" class="connection-status">INITIALIZING...</div>
         </header>
 
         <!-- MAIN PLAYER CORE -->
@@ -61,14 +63,7 @@
                         <input type="range" id="volume-slider" min="0" max="100" value="50">
                     </div>
                 </div>
-                
-                <div class="mixer-row">
-                    <label class="hud-label">PLAY SONG OUTSIDE OF AMAZON?</label>
-                    <label class="hud-switch">
-                        <input type="checkbox" id="active-tab-toggle">
-                        <span class="hud-slider"></span>
-                    </label>
-                </div>
+
             </div>
         </section>
 

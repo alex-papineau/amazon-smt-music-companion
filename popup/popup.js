@@ -1,4 +1,4 @@
-const activeTabToggle = document.getElementById('active-tab-toggle');
+
 const volumeSlider = document.getElementById('volume-slider');
 const trackSelect = document.getElementById('track-select');
 const toggleBtn = document.getElementById('toggle-btn');
@@ -26,13 +26,14 @@ function populateTracks() {
 }
 
 // Load settings
-chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab', 'repeat'], (data) => {
+chrome.storage.local.get(['enabled', 'volume', 'track', 'playEverywhere', 'repeat'], (data) => {
     populateTracks();
 
     isMusicEnabled = data.enabled !== false; // Default to true
-    updateToggleIcon(isMusicEnabled);
+    // Initially assume paused if unknown, it will sync in 500ms
+    updateToggleIcon(isMusicEnabled, true);
 
-    activeTabToggle.checked = data.onlyActiveTab !== false; // Default to true
+    // activeTabToggle.checked = !!data.playEverywhere; // REMOVED
     volumeSlider.value = data.volume || 50;
 
     let track = data.track || getDefaultTrackUrl();
@@ -45,23 +46,21 @@ chrome.storage.local.get(['enabled', 'volume', 'track', 'onlyActiveTab', 'repeat
 function updateSettings() {
     const settings = {
         enabled: isMusicEnabled,
-        onlyActiveTab: activeTabToggle.checked,
         volume: parseInt(volumeSlider.value),
         track: trackSelect.value,
         repeat: repeatBtn.classList.contains('active')
     };
 
     chrome.storage.local.set(settings);
-    updateToggleIcon(settings.enabled);
+    // Optimistic UI update while waiting for actual sync
+    updateToggleIcon(settings.enabled, !settings.enabled);
 }
 
 function updateRepeatState(isRepeating) {
     if (isRepeating) {
         repeatBtn.classList.add('active');
-        repeatBtn.style.boxShadow = "0 0 8px #fff";
     } else {
         repeatBtn.classList.remove('active');
-        repeatBtn.style.boxShadow = "none";
     }
 }
 
@@ -73,11 +72,11 @@ async function checkAmazonTab() {
         url.includes('amazon.es') || url.includes('amazon.co.jp');
 
     if (isAmazon) {
-        marketStatus.textContent = "LINK ONLINE";
+        marketStatus.textContent = "ONLINE";
         marketStatus.style.color = "#fff";
         marketStatus.style.opacity = "1";
     } else {
-        marketStatus.textContent = "LINK OFFLINE // NO TARGET DETECTED";
+        marketStatus.textContent = "OFFLINE // NO TARGET DETECTED";
         marketStatus.style.color = "var(--accent-red)";
         marketStatus.style.opacity = "0.8";
     }
@@ -99,6 +98,10 @@ function updateProgress() {
                 progressBar.value = (currentTime / duration) * 100;
                 timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
             }
+            // Update icon in real-time based on actual playback state
+            chrome.storage.local.get('enabled', (data) => {
+                updateToggleIcon(!!data.enabled, paused);
+            });
         }
     });
 }
@@ -111,16 +114,28 @@ progressBar.addEventListener('input', () => {
     chrome.runtime.sendMessage({ type: 'SEEK_TRACK', progress: parseFloat(seekTo) });
 });
 
-function updateToggleIcon(enabled) {
-    toggleBtn.innerHTML = enabled ? PAUSE_ICON : PLAY_ICON;
+function updateToggleIcon(enabled, actualPaused) {
+    // If enabled is false (Power Off), always show Play
+    // If enabled is true (Power On) but context is wrong (actualPaused is true), show Play but maybe dim
+    // If actually playing, show Pause
+    
+    toggleBtn.innerHTML = (enabled && !actualPaused) ? PAUSE_ICON : PLAY_ICON;
+    
+    // Use the glow-btn class or similar to show Power state
+    if (enabled) {
+        toggleBtn.classList.add('active-power');
+    } else {
+        toggleBtn.classList.remove('active-power');
+    }
+
     const statusIcon = document.getElementById('status-icon');
     if (statusIcon) {
-        statusIcon.style.opacity = enabled ? "1" : "0.5";
-        statusIcon.style.filter = enabled ? "drop-shadow(0 0 5px #fff)" : "grayscale(1)";
+        statusIcon.style.opacity = (enabled && !actualPaused) ? "1" : "0.5";
+        statusIcon.style.filter = (enabled && !actualPaused) ? "none" : "grayscale(1)";
     }
 }
 
-activeTabToggle.addEventListener('change', updateSettings);
+
 volumeSlider.addEventListener('input', updateSettings);
 trackSelect.addEventListener('change', () => {
     isMusicEnabled = true;
@@ -134,7 +149,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
     if (area === 'local' && changes.enabled) {
         isMusicEnabled = changes.enabled.newValue;
-        updateToggleIcon(isMusicEnabled);
+        // Don't update icon here, let the poll handle it for accuracy
+        // or do an optimistic update if you prefer.
     }
     if (area === 'local' && changes.repeat) {
         updateRepeatState(changes.repeat.newValue);

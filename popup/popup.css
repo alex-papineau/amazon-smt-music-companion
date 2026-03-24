@@ -27,24 +27,6 @@ body {
     background-color: var(--dark-bg);
     overflow: hidden;
     position: relative;
-    border: 1px solid #fff;
-    box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.1);
-}
-
-/* Background grid effect */
-body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
-    z-index: -1;
-    pointer-events: none;
 }
 
 .hud-container {
@@ -55,12 +37,16 @@ body::before {
 }
 
 /* Header Styles */
+header {
+    border-bottom: 2px solid #fff;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
 .hud-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 2px solid #fff;
-    padding-bottom: 12px;
 }
 
 .status-indicator {
@@ -71,13 +57,11 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 10px var(--glow-color);
 }
 
 .status-indicator img {
     width: 38px;
     height: 38px;
-    filter: drop-shadow(0 0 2px #fff);
 }
 
 .title-section {
@@ -106,7 +90,6 @@ body::before {
     background: var(--glass-bg);
     border: 1px solid var(--border-color);
     padding: 12px;
-    backdrop-filter: blur(4px);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -116,7 +99,6 @@ body::before {
 .hud-label {
     font-size: 10px;
     color: #fff;
-    opacity: 0.7;
     margin-bottom: 4px;
     display: block;
     letter-spacing: 1px;
@@ -133,21 +115,8 @@ select {
     border: 1px solid var(--border-color);
     padding: 8px;
     font-family: 'Megaten20XX', monospace;
-    font-size: 12px;
-    outline: none;
+    font-size: 10px;
     cursor: pointer;
-    appearance: none;
-}
-
-.select-wrapper::after {
-    content: "▼";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 8px;
-    color: #fff;
-    pointer-events: none;
 }
 
 /* Progress bar styling */
@@ -172,7 +141,7 @@ input[type=range]#progress-bar {
     appearance: none;
     flex: 1;
     height: 6px;
-    background: rgba(0, 243, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--border-color);
     outline: none;
 }
@@ -183,7 +152,6 @@ input[type=range]#progress-bar::-webkit-slider-thumb {
     height: 14px;
     background: #fff;
     cursor: pointer;
-    box-shadow: 0 0 8px #fff;
     border-radius: 0;
 }
 
@@ -218,7 +186,11 @@ input[type=range]#progress-bar::-webkit-slider-thumb {
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    box-shadow: 0 0 10px var(--glow-color);
+}
+
+#toggle-btn.active-power {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 #toggle-btn:hover {
@@ -234,7 +206,7 @@ input[type=range]#progress-bar::-webkit-slider-thumb {
 }
 
 .icon-btn {
-    background: rgba(0, 243, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-color);
     padding: 6px 4px;
@@ -246,7 +218,7 @@ input[type=range]#progress-bar::-webkit-slider-thumb {
 }
 
 .icon-btn:hover {
-    background: rgba(0, 243, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-color: #fff;
 }
 
@@ -309,7 +281,10 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 .hud-slider {
     position: absolute;
     cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgba(255, 255, 255, 0.1);
     transition: .3s;
     border: 1px solid var(--border-color);
@@ -326,13 +301,12 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
     transition: .3s;
 }
 
-input:checked + .hud-slider {
-    background-color: rgba(0, 243, 255, 0.2);
+input:checked+.hud-slider {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
-input:checked + .hud-slider:before {
+input:checked+.hud-slider:before {
     transform: translateX(22px);
-    box-shadow: 0 0 5px #fff;
 }
 
 /* Footer Section */
@@ -352,8 +326,15 @@ input:checked + .hud-slider:before {
 
 /* Global Animations */
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 .connection-status {
