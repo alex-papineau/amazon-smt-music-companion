@@ -16,9 +16,4 @@ A Firefox extension that plays shop and "black market" music from *Shin Megami T
 4. Select `manifest.json`.
 5. Visit any Amazon domain to activate.
 
-## TO DO
-
-- Add more music
-- Make the Random button not truly random to prevent repeats
-- Make the music shuffle by default and add a "Repeat" button to toggle repeat mode
-- Update UI to add a message when no amazon tab is open
+NOT YET A PERMANENT PLUGIN SORRY
